@@ -1,0 +1,131 @@
+import React, { useState, useEffect{{#if sort}}, useRef{{/if}} } from 'react';
+import { IRouteComponentProps } from 'umi';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Form, Row, Col, Spin, Button } from 'antd';
+import ProTable, { ProColumns } from '@ant-design/pro-table';
+import { SearchForm, TableListItem } from './data';
+import WarehouseSelector from '@/components/WarehouseSelector';
+import SearchArea from '@/components/SearchArea';
+{{#if service}}
+import { queryListData } from '@/services/{{ name }}API';
+{{/if}}
+{{#if sort}}
+import { Order } from '@/services/wms';
+{{/if}}
+import styles from './style.less';
+
+const {{ properCase name }}: React.FC<IRouteComponentProps> = (props) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [totalNumber, setTotalNumber] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPageSize, setCurrentPageSize] = useState<number>(15);
+  const [tableData, setTableData] = useState<TableListItem[]>([]);
+  {{#if sort}}
+  const orderRef = useRef<Order>({ orderColumn: '{{ sortName }}', orderRule: 'desc' });
+  {{/if}}
+  const [searchForm] = Form.useForm<SearchForm>();
+  const columns: ProColumns<TableListItem>[] = [
+    {
+      title: 'Warehouse',
+      dataIndex: 'warehouse_number',
+    },
+  ];
+
+  useEffect(() => {
+    initPage();
+  }, []);
+
+  const initPage = () => {
+    queryList();
+  };
+
+  const queryList = async (page = 1, pageSize = currentPageSize) => {
+    const data = searchForm.getFieldsValue();
+    if (!data.warehouse_number) return;
+    setIsLoading(true);
+    setCurrentPage(page);
+    setCurrentPageSize(pageSize);
+    {{#if service}}
+    const res = await queryListData({
+      warehouse_number: data?.warehouse_number,
+      startColumn: (page - 1) * pageSize,
+      pageSize: pageSize,
+      {{#if sort}}order: orderRef.current,{{/if}}
+    });
+    if (res.success) {
+      setTableData(res.body.data);
+      setTotalNumber(res.body.recordsFiltered);
+    }
+    {{/if}}
+    setIsLoading(false);
+  };
+
+  const handleTableChange = (pagination: any{{#if sort}}, filters: any, sorter: any{{/if}}) => {
+    {{#if sort}}
+    const order = {
+      orderColumn: sorter.field || '{{ sortName }}',
+      orderRule: sorter.order === 'ascend' ? 'asc' : 'desc',
+    };
+    orderRef.current = order;
+    {{/if}}
+    queryList(pagination.pageSize === currentPageSize ? pagination.current : 1, pagination.pageSize);
+  };
+
+  return (
+    <PageContainer className={styles.{{ camelCase name ~}} }>
+      <Spin spinning={isLoading}>
+        <SearchArea>
+          <Form
+            form={searchForm}
+            name="searchForm"
+            onFinish={() => {
+              queryList();
+            } }
+            onReset={() => searchForm.resetFields()}
+          >
+            <Row gutter={[12, 8]} align="bottom">
+              <Col span={4}>
+                <WarehouseSelector />
+              </Col>
+              <Col span={20} className={styles.searchAlign}>
+                <Button type="primary" htmlType="submit" loading={isLoading}>
+                  Search
+                </Button>
+                <Button htmlType="reset" loading={isLoading} className={styles.resetButton}>
+                  Reset
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        </SearchArea>
+        <ProTable<TableListItem>
+          options={false}
+          search={false}
+          tableAlertRender={false}
+          tableAlertOptionRender={false}
+          dataSource={tableData}
+          columns={columns}
+          // rowKey根据业务调整
+          rowKey={(record) => record.rec_id}
+          pagination={ {
+            total: totalNumber,
+            current: currentPage,
+            defaultPageSize: currentPageSize,
+            pageSizeOptions: ['10', '15', '20', '50', '100'],
+            showSizeChanger: true,
+          } }
+          rowClassName={(record, index) => {
+            return index % 2 === 1 ? 'even' : 'odd';
+          } }
+          className={styles.tableStyles}
+          bordered
+          sticky
+          onChange={handleTableChange}
+          sortDirections={['descend', 'ascend', 'descend']}
+        />
+      </Spin>
+    </PageContainer>
+  );
+};
+
+export default {{ properCase name }};

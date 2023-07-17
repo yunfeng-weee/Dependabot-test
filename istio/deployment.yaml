@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: central-wms-web
+  namespace: central
+  labels:
+    app: central-wms-web
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: central-wms-web
+  template:
+    metadata:
+      labels:
+        app: central-wms-web
+    spec:
+      containers:
+        - name: central-wms-web
+          image: 063035886041.dkr.ecr.us-east-2.amazonaws.com/central-wms-web:${VERSION}
+          imagePullPolicy: Always
+          ports:
+            - name: main-port
+              containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 15
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 150
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "1000Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1500Mi"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nodeclass
+                operator: In
+                values:
+                - wms
+      tolerations:      
+        - key: "nodeclass"        
+          operator: "Equal"        
+          value: "wms"        
+          effect: "NoExecute"

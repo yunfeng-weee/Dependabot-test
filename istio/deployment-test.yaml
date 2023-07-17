@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: central-wms-web
+  labels:
+    app: central-wms-web
+    version: latest
+  namespace: central
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: central-wms-web
+      version: latest
+  template:
+    metadata:
+      labels:
+        app: central-wms-web
+        version: latest
+    spec:
+      containers:
+        - name: central-wms-web
+          image: 551230544614.dkr.ecr.us-east-2.amazonaws.com/central-wms-web:latest
+          imagePullPolicy: Always
+          ports:
+            - name: main-port
+              containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "1000Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1500Mi"

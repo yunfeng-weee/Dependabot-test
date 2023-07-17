@@ -1,0 +1,18 @@
+import request from '@/utils/WeeeRequest';
+{{#if sort}}
+import { Order } from './wms';
+{{/if}}
+
+export interface QueryListDataParams {
+  warehouse_number: string;
+  startColumn: number;
+  pageSize: number;
+  {{#if sort}}order: Order;{{/if}}
+}
+
+export async function queryListData(params: QueryListDataParams) {
+  return request('', {
+    method: 'post',
+    data: params,
+  });
+}

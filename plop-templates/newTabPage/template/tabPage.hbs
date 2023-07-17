@@ -1,0 +1,19 @@
+import React, { useState } from 'react';
+import { Spin } from 'antd';
+import { PageContainer } from '@ant-design/pro-layout';
+
+interface Props {}
+
+const {{ properCase tabName }}: React.FC<Props> = (props) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  return (
+    <PageContainer>
+      <Spin spinning={isLoading}>
+        <div>{{ properCase tabName }}</div>
+      </Spin>
+    </PageContainer>
+  );
+};
+
+export default {{ properCase tabName }};

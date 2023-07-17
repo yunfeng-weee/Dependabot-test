@@ -1,0 +1,11 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: central-wms-web
+  namespace: central
+spec:
+  host: central-wms-web
+  subsets:
+    - name: base
+      labels:
+        app: central-wms-web

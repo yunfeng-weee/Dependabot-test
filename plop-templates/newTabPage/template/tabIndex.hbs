@@ -1,0 +1,37 @@
+import { PageContainer } from '@ant-design/pro-layout';
+import { Tabs } from 'antd';
+import React, { lazy, Suspense, useState } from 'react';
+import styles from './style.less';
+const Tab1 = lazy(() => import('./tab1'));
+const Tab2 = lazy(() => import('./tab2'));
+
+const {{ properCase name }} = () => {
+  const { TabPane } = Tabs;
+  const [activeKey, setActiceKey] = useState<string>('tab1');
+
+  return (
+    <PageContainer>
+      <Tabs
+        activeKey={activeKey}
+        type="card"
+        className={styles.testPage}
+        onChange={(key) => {
+          setActiceKey(key);
+        } }
+      >
+        <TabPane tab="Tab1" key="tab1">
+          <Suspense fallback={<div>Loading...</div>}>
+            <Tab1 />
+          </Suspense>
+        </TabPane>
+        <TabPane tab="Tab2" key="tab2">
+          <Suspense fallback={<div>Loading...</div>}>
+            <Tab2 />
+          </Suspense>
+        </TabPane>
+      </Tabs>
+    </PageContainer>
+  );
+};
+
+export default {{ properCase name }};

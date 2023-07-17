@@ -1,0 +1,19 @@
+.{{ camelCase name }} {
+  .searchAlign {
+    text-align: right;
+    .resetButton {
+      margin-left: 12px;
+    }
+	}
+  .tableStyles {
+    :global {
+      .ant-table.ant-table-middle .ant-table-content {
+        .ant-table-thead > tr > th,
+        .ant-table-tbody > tr > td {
+          padding: 10px 8px;
+        }
+      }
+    }
+  }
+  
+}

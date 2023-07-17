@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: central-wms-web
+  namespace: central
+spec:
+  hosts:
+    - wms.sayweee.net
+  gateways:
+    - ingressgateway.istio-system.svc.cluster.local
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: central-wms-web
